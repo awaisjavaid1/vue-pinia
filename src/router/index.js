@@ -1,44 +1,67 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {
+    createRouter,
+    createWebHistory
+} from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import { userAuthStore } from '@/store/user';
+import NavbarView from '@/components/NavbarView'
 
-const routes = [
-  {
+// import { userAuthStore } from '@/store/user';
+
+const routes = [{
     path: '/',
-    name: 'home',
-    component: HomeView
-  },
-  {
-    path: '/about',
-    name: 'about',
-    component: () => import('../views/AboutView.vue')
-  },
-  {
-    path: '/signup',
-    name: 'signup',
-    component: () => import('../views/SignUp.vue')
-  },
-  {
-    path: '/signin',
-    name: 'signin',
-    component: () => import('../views/SignIn.vue')
-  }
-]
-
-
+    component: NavbarView,
+    children: [{
+            path: '/home',
+            name: 'home',
+            component: HomeView
+        },
+        {
+            path: '/dashboard',
+            name: 'dashboard',
+            component: () => import('../views/DashboardView.vue')
+        },
+        {
+            path: '/signup',
+            name: 'signup',
+            component: () => import('../views/SignUp.vue')
+        },
+        {
+            path: '/signin',
+            name: 'signin',
+            component: () => import('../views/SignIn.vue')
+        },
+        {
+            path: '/product/detail/:id',
+            name: 'productDetail',
+            component: () => import('../views/ProductDetail.vue')
+        },
+        {
+            path: '/add/product',
+            name: 'addProduct',
+            component: () => import('../views/product/AddProduct.vue')
+        },
+        {
+            path: '/category',
+            name: 'category',
+            component: () => import('../views/category/AddCategory.vue')
+        }
+    ]
+}]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
-  routes
+    history: createWebHistory(process.env.BASE_URL),
+    routes
 })
 
 router.beforeEach((to) => {
     const publicPages = ['/signup', '/signin'];
     const authRequired = !publicPages.includes(to.path);
-    const auth = userAuthStore();
-  if (authRequired && !auth.user) {
-      auth.returnUrl = to.fullPath;
-      return '/signin';
+    // const auth = userAuthStore();
+    // auth.token
+    const auth = localStorage.getItem('token');
+    if (authRequired && auth == 'null') {
+        // auth.returnUrl = to.fullPath;
+        router.push('/signin')
     }
 
 })
